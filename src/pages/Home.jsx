@@ -8,9 +8,7 @@ const Home = () => {
   const [quizContent, setQuizContent] = useState([]);
   const [pdfContent, setPdfContent] = useState();
   const [input, setInput] = useState();
-  const [videoUrl, setVideoUrl] = useState(
-    "https://resource2.heygen.ai/video/964b6acd95294f80ad70d1c298456de7/1280x720.mp4"
-  );
+  const [videoUrl, setVideoUrl] = useState();
   const [chat, setChat] = useState([]);
 
   const handleFileUpload = async (event) => {
@@ -75,6 +73,19 @@ const Home = () => {
         ];
       });
     }
+  };
+
+  const handleSendMessage = () => {
+    // Optionally prevent sending empty messages
+    if (!input?.trim()) return;
+
+    const newMessage = { role: "user", content: input };
+    // Update chat state
+    setChat((prevChat) => [...prevChat, newMessage]);
+    // Call getGptResponse with the updated chat
+    getGptResponse([...chat, newMessage]);
+    // Clear the input box
+    setInput("");
   };
 
   useEffect(() => {
@@ -145,13 +156,13 @@ const Home = () => {
       )}
 
       <br></br>
-      {/* {pdfContent && <h1 className="text-lg font-bold">Speech</h1>}
+      {pdfContent && <h1 className="text-lg font-bold">Speech</h1>}
       <br></br>
-      {content && <p>{content}</p>} */}
+      {content && <p>{content}</p>}
       <br />
-      {/* {processingStatus === "processing" && (
+      {processingStatus === "processing" && (
         <Loader text="Generating Video..." />
-      )} */}
+      )}
 
       {videoUrl && (
         <video width="100%" height="auto" controls>
@@ -162,40 +173,45 @@ const Home = () => {
       <br></br>
       {pdfContent && (
         <>
-          <div className="bg-red-200 w-full h-80 overflow-auto rounded-lg pb-10">
-            {chat.map((c) => {
-              if (c.role != "system") {
-                return (
-                  <div className="w-full h-14 relative block py-2">
-                    <p
-                      className={`absolute m-4 p-2 rounded-lg bg-red-300 inline-block ${
-                        c.role == "user" ? `right-0` : ``
-                      }`}
-                    >
-                      {c.content}
-                    </p>
-                  </div>
-                );
-              }
-            })}
+          <div className="bg-gray-200 w-full h-80 overflow-auto rounded-lg pb-10">
+            <div className="flex flex-col">
+              {chat.map(
+                (c, index) =>
+                  c.role !== "system" && (
+                    <div key={index} className="flex py-2">
+                      <p
+                        className={`m-4 mb-2 p-2 rounded-lg bg-gray-300 ${
+                          c.role === "user"
+                            ? "ml-auto max-w-[30rem]"
+                            : "mr-auto max-w-[30rem]"
+                        }`}
+                      >
+                        {c.content}
+                      </p>
+                    </div>
+                  )
+              )}
+            </div>
           </div>
+
           <br></br>
+          {/* Chat input and send button */}
           <div className="flex justify-between">
             <input
-              onChange={(e) => {
-                setInput(e.target.value);
+              type="text"
+              value={input || ""} // making sure the input is controlled
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSendMessage();
+                }
               }}
               placeholder="Ask any questions"
-              className="inline w-full bg-red-200 placeholder:text-gray-600 p-3 rounded"
-            ></input>
+              className="inline w-full bg-gray-200 placeholder:text-gray-600 p-3 rounded"
+            />
             <button
-              onClick={() => {
-                setChat((prevChat) => {
-                  return [...prevChat, { role: "user", content: input }];
-                });
-                getGptResponse([...chat, { role: "user", content: input }]);
-              }}
-              className="p-4 bg-red-300 text-red-900 ml-2"
+              onClick={handleSendMessage}
+              className="p-4 bg-gray-300 text-gray-900 ml-2"
             >
               Send
             </button>
@@ -224,8 +240,6 @@ const Home = () => {
                   }`}
                 >
                   <input type="checkbox" onChange={() => handleAnswer(index)} />
-                  {console.log(optionKey)}
-                  {console.log(quiz.correct_answer)}
                   <p className="inline ml-2">{quiz[optionKey]}</p>
                 </div>
               )
