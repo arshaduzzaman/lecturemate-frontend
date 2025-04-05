@@ -20,6 +20,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-quizlet-flashcard": "^3.0.0",
+    "react-router-dom": "^6.30.0",
+    "swiper": "^8.4.7",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
@@ -36,5 +38,10 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "vite": "^6.2.0"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
